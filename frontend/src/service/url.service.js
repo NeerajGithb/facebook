@@ -4,7 +4,7 @@ const ApiUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const axiosInstance = axios.create({
     baseURL: ApiUrl,
-    withCredentials:true
-})
+    withCredentials: true,
+});
 
 export default axiosInstance;
