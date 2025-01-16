@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { X, Trash } from "lucide-react";
 import React, { useState } from "react";
-import Confirm from "../components/confirm";
+import Confirm from "../components/Confirm";
 const ShowStoryPreview = ({
   file,
   fileType,
