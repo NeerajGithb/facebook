@@ -24,7 +24,7 @@ import PostComments from "./PostComments";
 import { formateDate } from "@/lib/utils";
 import { usePostStore } from "@/store/usePostStore";
 import userStore from "@/store/userStore";
-import Confirm from "../components/confirm";
+import Confirm from "../components/Confirm";
 const PostCard = ({ post, isLiked, onShare, onComment, onLike }) => {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [showComments, setShowComments] = useState(false);
