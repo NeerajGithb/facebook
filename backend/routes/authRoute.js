@@ -23,7 +23,7 @@ router.get('/google/callback', passport.authenticate('google', {failureRedirect:
     const accessToken = generateToken(req?.user);
     res.cookie("auth_token",accessToken,{
         httpOnly: true,
-        sameSite: "strict",
+        sameSite: "none",
         secure:true
     })
    res.redirect(`${process.env.FRONTEND_URL}`)
