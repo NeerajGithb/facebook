@@ -33,32 +33,16 @@ export const logout = async()=>{
 
 
 //check auth api
-export const checkUserAuth = async () => {
+export const checkUserAuth = async() =>{
     try {
-      // Retrieve the token from localStorage or wherever it is stored
-      const token = localStorage.getItem('authToken'); // Assuming your token is in localStorage
-  
-      // Ensure the token exists
-      if (!token) {
-        return { isAuthenticated: false, message: 'No token found.' };
-      }
-  
-      // Make the request with the Authorization header
-      const response = await axiosInstance.get('users/check-auth', {
-        headers: {
-          Authorization: `Bearer ${token}`, // Attach token here
-        },
-      });
-  
-      // Check for successful response
-      if (response.data.status === 'success') {
-        return { isAuthenticated: true, user: response.data.data };
-      } else {
-        return { isAuthenticated: false, message: response.data.message };
-      }
+         const response= await axiosInstance.get('users/check-auth');
+         if(response.data.status === 'success'){
+            return {isAuthenticated :true, user:response?.data?.data}
+         }else if(response.status === 'error'){
+            return {isAuthenticated :false}
+         }
     } catch (error) {
-      console.error('Error in checkUserAuth:', error);
-      return { isAuthenticated: false, message: error.message };
+        console.log(error)
+        return {isAuthenticated :false}
     }
-  };
-  
+}
