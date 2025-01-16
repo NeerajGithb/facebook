@@ -35,32 +35,30 @@ export const logout = async()=>{
 //check auth api
 export const checkUserAuth = async () => {
     try {
-      const response = await axiosInstance.get('users/check-auth');
+      // Retrieve the token from localStorage or wherever it is stored
+      const token = localStorage.getItem('authToken'); // Assuming your token is in localStorage
   
-      // Check if the response indicates success
+      // Ensure the token exists
+      if (!token) {
+        return { isAuthenticated: false, message: 'No token found.' };
+      }
+  
+      // Make the request with the Authorization header
+      const response = await axiosInstance.get('users/check-auth', {
+        headers: {
+          Authorization: `Bearer ${token}`, // Attach token here
+        },
+      });
+  
+      // Check for successful response
       if (response.data.status === 'success') {
         return { isAuthenticated: true, user: response.data.data };
       } else {
-        // If status is something else (not 'success'), return false
-        console.log('Authentication failed:', response.data.message || 'Unknown error');
-        return { isAuthenticated: false };
+        return { isAuthenticated: false, message: response.data.message };
       }
     } catch (error) {
-      // Log and handle different types of errors
-      if (error.response) {
-        // The request was made, but the server responded with a status code
-        // outside the range of 2xx
-        console.log('Error response:', error.response.data);
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.log('No response received:', error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.log('Request setup error:', error.message);
-      }
-  
-      // In case of any error, consider the user as not authenticated
-      return { isAuthenticated: false };
+      console.error('Error in checkUserAuth:', error);
+      return { isAuthenticated: false, message: error.message };
     }
   };
   
