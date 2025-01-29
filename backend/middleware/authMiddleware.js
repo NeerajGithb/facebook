@@ -1,19 +1,31 @@
 const jwt = require('jsonwebtoken');
-const response = require('../utils/responceHandler');
+const response = require('../utils/responseHandler'); // Ensure this utility is correct
 
+const authMiddleware = (req, res, next) => {
+  // Retrieve token from cookies
+  const authToken = req?.cookies?.auth_token;
 
-const  authMiddleware = (req,res,next) =>{
-    const authToken = req?.cookies?.auth_token;
-    if(!authToken) return response(res,401, 'Authentication required. please provide a token');
+  // If no token is provided, respond with 401 Unauthorized
+  if (!authToken) {
+    return response(res, 401, 'Authentication required. Please provide a token');
+  }
 
-    try {
-         const decode = jwt.verify(authToken,process.env.JWT_SECRET);
-         req.user = decode;
-         next();
-    } catch (error) {
-        console.error(error)
-        return response(res,401, 'Invalid token or expired. Please try again')
-    }
+  try {
+    // Verify the JWT token
+    const decoded = jwt.verify(authToken, process.env.JWT_SECRET);
+
+    // Attach the decoded token data (user info) to the request object
+    req.user = decoded;
+
+    // Proceed to the next middleware or route handler
+    next();
+  } catch (error) {
+    // Log the error for debugging purposes
+    console.error(error);
+
+    // Respond with a 401 Unauthorized status if the token is invalid or expired
+    return response(res, 401, 'Invalid token or expired. Please log in again.');
+  }
 }
 
 module.exports = authMiddleware;
