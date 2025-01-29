@@ -8,17 +8,17 @@ const postRoute= require('./routes/postRoute')
 const userRoute = require('./routes/userRoute');
 const passport = require('./controllers/googleController');
 
-
 const app = express()
 app.use(express.json())
 app.use(cookieParser())
 
-
 const corsOptions = {
-    origin:process.env.FRONTEND_URL,
-    credentials:true,
-    allowedHeaders: "Content-Type,Authorization" // Allowed headers
-}
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization", "Access-Control-Allow-Headers"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+};
+
 app.use(cors(corsOptions))
 
 connectDb()

@@ -33,16 +33,21 @@ export const logout = async()=>{
 
 
 //check auth api
-export const checkUserAuth = async() =>{
+export const checkUserAuth = async () => {
     try {
-         const response= await axiosInstance.get('users/check-auth');
-         if(response.data.status === 'success'){
-            return {isAuthenticated :true, user:response?.data?.data}
-         }else if(response.status === 'error'){
-            return {isAuthenticated :false}
-         }
+        const response = await axiosInstance.get("users/check-auth");
+
+        if (response.status === 200 && response.data.status === "success") {
+            return { isAuthenticated: true, user: response?.data?.data };
+        }
     } catch (error) {
-        console.log(error)
-        return {isAuthenticated :false}
+        if (error.response?.status === 401) {
+            console.warn("User is not authenticated");
+        } else {
+            console.error("Auth Check Error:", error);
+        }
     }
-}
+
+    return { isAuthenticated: false };
+};
+
