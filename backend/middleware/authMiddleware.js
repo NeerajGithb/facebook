@@ -8,10 +8,8 @@ const authMiddleware = async (req, res, next) => {
       console.log("No token found");
       return response(res, 401, "Authentication required. Please provide a token.");
     }
-
+    
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded token:", decoded);
-
     if (!decoded) {
       console.log("Invalid or expired token");
       return response(res, 401, "Invalid token or expired. Please log in again.");
