@@ -230,36 +230,32 @@ const getAllUser = async(req, res) =>{
    }
 }
 
-//check if user is authenticated or not 
+
+
 const checkUserAuth = async (req, res) => {
-    try {
-      // Check if userId exists in the request object (assumed to be set by authentication middleware)
-      const userId = req?.user?.userId;
-  
-      if (!userId) {
-        // Respond with 401 Unauthorized if no userId exists
-        return response(res, 401, 'Unauthenticated! Please log in before accessing the data');
-      }
-  
-      // Fetch user details and exclude sensitive information (like password)
-      const user = await User.findById(userId).select('-password');
-  
-      if (!user) {
-        // Respond with 404 Not Found if user does not exist in the database
-        return response(res, 404, 'User not found');
-      }
-  
-      // Successfully found user, return user details
-      return response(res, 200, 'User retrieved and allowed to use Facebook', user);
-  
-    } catch (error) {
-      // Catch any other errors and return 500 Internal Server Error
-      return response(res, 500, 'Internal server error', error.message);
+  try {
+    // Ensure user exists in the request (set by authentication middleware)
+    const userId = req?.user?._id; // ✅ Use _id instead of userId
+
+    if (!userId) {
+      return response(res, 401, "Unauthenticated! Please log in before accessing the data");
     }
+
+    // Fetch user details while excluding the password
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      return response(res, 404, "User not found");
+    }
+
+    // Return the authenticated user details
+    return response(res, 200, "User retrieved successfully", user);
+
+  } catch (error) {
+    console.error("Error in checkUserAuth:", error); // ✅ Debugging log
+    return response(res, 500, "Internal server error", error.message);
   }
-  
-
-
+};
 const getUserProfile = async(req, res) =>{
     try {
         const {userId} = req.params;

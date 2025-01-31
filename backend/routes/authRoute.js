@@ -1,33 +1,26 @@
 const express = require('express');
 const { registerUser, loginUser, logout } = require('../controllers/authController');
 const passport = require('passport');
-const { generateToken } = require('../utils/generateToken');
+const createSendToken = require('../utils/createSendToken'); // Importing createSendToken
 const router = express.Router();
 
+router.post('/register', registerUser);
+router.post('/login', loginUser);
+router.get('/logout', logout);
 
+// Google OAuth routes
+router.get('/google', passport.authenticate('google', {
+  scope: ['profile', 'email']
+}));
 
-router.post('/register',registerUser)
-router.post('/login',loginUser)
-router.get('/logout', logout)
+// Google callback route
+router.get('/google/callback', passport.authenticate('google', {
+  failureRedirect: `${process.env.FRONTEND_URL}/user-login`, session: false
+}), (req, res) => {
+  // Use createSendToken to generate and send the JWT token after successful Google authentication
+  createSendToken(req.user, 200, res, "Google login successful");
 
-
-
-//google oauth routes
-router.get('/google',passport.authenticate('google',{
-    scope: ['profile', 'email ']
-}))
-
-//google callback routes
-router.get('/google/callback', passport.authenticate('google', {failureRedirect: `${process.env.FRONTEND_URL}/user-login`, session:false}),
- (req,res) =>{ 
-    const accessToken = generateToken(req?.user);
-    res.cookie("auth_token",accessToken,{
-        httpOnly: true,
-        sameSite: 'None',
-        secure:true
-    })
-   res.redirect(`${process.env.FRONTEND_URL}`)
- }
-)
+  res.redirect(`${process.env.FRONTEND_URL}`);
+});
 
 module.exports = router;
