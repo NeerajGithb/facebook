@@ -12,13 +12,12 @@ const app = express()
 app.use(express.json())
 app.use(cookieParser())
 
-const corsOptions = {
+
+
+app.use(cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
-};
-
-
-app.use(cors(corsOptions))
+}))
 
 connectDb()
 app.use(passport.initialize())

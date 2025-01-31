@@ -36,7 +36,6 @@ export const logout = async()=>{
 export const checkUserAuth = async () => {
     try {
         const response = await axiosInstance.get("users/check-auth");
-
         if (response.status === 200 && response.data.status === "success") {
             return { isAuthenticated: true, user: response?.data?.data };
         }
