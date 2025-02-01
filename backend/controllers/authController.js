@@ -13,12 +13,10 @@ const createSendToken = (user, statusCode, res, message) => {
   const token = signToken(user._id);
 
   const cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
+    expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000),
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: true, // Always secure in production
+    sameSite: "None",
   };
 
   res.cookie("jwt", token, cookieOptions);
@@ -38,16 +36,13 @@ const registerUser = async (req, res) => {
   try {
     const { username, email, password, gender, dateOfBirth } = req.body;
 
-    // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return response(res, 400, "User with this email already exists");
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
     const newUser = await User.create({
       username,
       email,
@@ -57,7 +52,6 @@ const registerUser = async (req, res) => {
     });
 
     return createSendToken(newUser, 201, res, "Registration successful");
-
   } catch (error) {
     console.error("Register Error:", error);
     return response(res, 500, "Internal Server Error", error.message);
@@ -68,20 +62,17 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return response(res, 404, "User not found with this email");
     }
 
-    // Validate password
     const matchPassword = await bcrypt.compare(password, user.password);
     if (!matchPassword) {
       return response(res, 401, "Invalid Password");
     }
 
     return createSendToken(user, 200, res, "Login successful");
-
   } catch (error) {
     console.error("Login Error:", error);
     return response(res, 500, "Internal Server Error", error.message);
@@ -93,12 +84,11 @@ const logout = (req, res) => {
     res.cookie("jwt", "loggedout", {
       expires: new Date(Date.now() + 10 * 1000),
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: true,
+      sameSite: "None",
     });
 
     return response(res, 200, "Logged out successfully");
-
   } catch (error) {
     console.error("Logout Error:", error);
     return response(res, 500, "Internal Server Error", error.message);

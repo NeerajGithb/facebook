@@ -11,16 +11,14 @@ const createSendToken = (user, statusCode, res, message) => {
   const token = signToken(user._id);
 
   const cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
+    expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000),
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: true,  // Ensures cookie is only sent over HTTPS
+    sameSite: "None",  // Required for cross-site authentication
   };
 
   res.cookie("jwt", token, cookieOptions);
-  user.password = undefined;
+  user.password = undefined; // Prevent sending password in response
 
   return response(res, statusCode, message, {
     token,
