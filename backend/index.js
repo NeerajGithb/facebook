@@ -16,7 +16,7 @@ app.use(cookieParser());
 
 // ✅ Fix CORS to allow credentials (cookies, authorization headers)
 app.use(cors({
-    origin: "https://facebook-n.vercel.app",
+    origin: process.env.FRONTEND_URL,
     credentials: true, 
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: "Content-Type,Authorization",
