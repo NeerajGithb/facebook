@@ -11,11 +11,19 @@ const signToken = (id) => {
 
 const createSendToken = (user, statusCode, res, message) => {
   const token = signToken(user._id);
-
   user.password = undefined; // Hide password from response
 
+  // ✅ Set JWT in HTTP-Only Cookies & Response Headers
+  res.cookie("jwt", token, {
+    httpOnly: true, 
+    secure: process.env.NODE_ENV === "production", 
+    sameSite: "None", 
+  });
+
+  res.setHeader("Authorization", `Bearer ${token}`);
+
   return response(res, statusCode, message, {
-    token, // Send token in response body
+    token, // ✅ Token sent in response body
     user: {
       id: user._id,
       username: user.username,
@@ -73,6 +81,7 @@ const loginUser = async (req, res) => {
 
 const logout = (req, res) => {
   try {
+    res.cookie("jwt", "", { maxAge: 1 }); // ✅ Clear token from cookie
     return response(res, 200, "Logged out successfully");
   } catch (error) {
     console.error("Logout Error:", error);
