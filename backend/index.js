@@ -13,7 +13,10 @@ app.use(express.json())
 
 
 app.use(cors({
-    origin: "https://facebook-n.vercel.app",
+    origin: process.env.FRONTEND_URL,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Content-Type,Authorization", // Allow these headers
+    credentials: false // Allow credentials (only if you are using cookies)
 }))
 
 connectDb()
