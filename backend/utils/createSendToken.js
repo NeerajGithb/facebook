@@ -3,31 +3,27 @@ const response = require("../utils/responceHandler");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+    expiresIn: process.env.JWT_EXPIRES_IN || "7d", // Default to 7 days
   });
 };
 
 const createSendToken = (user, statusCode, res, message) => {
-  const token = signToken(user._id);
+  try {
+    const token = signToken(user._id);
+    user.password = undefined; // Remove password from response
 
-  const cookieOptions = {
-    expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000),
-    httpOnly: true,
-    secure: true,  // Ensures cookie is only sent over HTTPS
-    sameSite: "None",  // Required for cross-site authentication
-  };
-
-  res.cookie("jwt", token, cookieOptions);
-  user.password = undefined; // Prevent sending password in response
-
-  return response(res, statusCode, message, {
-    token,
-    user: {
-      id: user._id,
-      username: user.username,
-      email: user.email,
-    },
-  });
+    return response(res, statusCode, message, {
+      token, // ✅ No cookie, return token directly
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error("Error in createSendToken:", error);
+    return response(res, 500, "Token generation failed", { error: error.message });
+  }
 };
 
 module.exports = createSendToken;

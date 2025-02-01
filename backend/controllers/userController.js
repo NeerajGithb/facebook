@@ -231,31 +231,32 @@ const getAllUser = async(req, res) =>{
 }
 
 
-
 const checkUserAuth = async (req, res) => {
-  try {
-    // Ensure user exists in the request (set by authentication middleware)
-    const userId = req?.user?._id; // ✅ Use _id instead of userId
-
-    if (!userId) {
-      return response(res, 401, "Unauthenticated! Please log in before accessing the data");
+    try {
+      // Ensure user exists in the request (set by authentication middleware)
+      if (!req.user || !req.user._id) {
+        return response(res, 401, "Unauthenticated! Please log in before accessing the data");
+      }
+  
+      const userId = req.user._id;
+  
+      // Fetch user details while excluding the password
+      const user = await User.findById(userId).select("-password");
+  
+      if (!user) {
+        return response(res, 404, "User not found");
+      }
+  
+      // Return the authenticated user details
+      return response(res, 200, "User retrieved successfully", user);
+    } catch (error) {
+      console.error("Error in checkUserAuth:", error); // ✅ Debugging log
+      return response(res, 500, "Internal server error", { error: error.message });
     }
-
-    // Fetch user details while excluding the password
-    const user = await User.findById(userId).select("-password");
-
-    if (!user) {
-      return response(res, 404, "User not found");
-    }
-
-    // Return the authenticated user details
-    return response(res, 200, "User retrieved successfully", user);
-
-  } catch (error) {
-    console.error("Error in checkUserAuth:", error); // ✅ Debugging log
-    return response(res, 500, "Internal server error", error.message);
-  }
 };
+
+  
+
 const getUserProfile = async(req, res) =>{
     try {
         const {userId} = req.params;

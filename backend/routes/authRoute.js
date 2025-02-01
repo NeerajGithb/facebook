@@ -20,7 +20,12 @@ router.get('/google/callback', passport.authenticate('google', {
   // Use createSendToken to generate and send the JWT token after successful Google authentication
   createSendToken(req.user, 200, res, "Google login successful");
 
-  res.redirect(`${process.env.FRONTEND_URL}`);
+  // Send the response with the redirect URL and token
+  res.json({
+    message: "Google login successful",
+    token: res.token,  // The token generated in createSendToken will be available here
+    redirectUrl: `${process.env.FRONTEND_URL}`
+  });
 });
 
-module.exports = router;
+module.exports = router;;

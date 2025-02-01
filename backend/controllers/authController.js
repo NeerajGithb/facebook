@@ -12,18 +12,10 @@ const signToken = (id) => {
 const createSendToken = (user, statusCode, res, message) => {
   const token = signToken(user._id);
 
-  const cookieOptions = {
-    expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000),
-    httpOnly: true,
-    secure: true, // Always secure in production
-    sameSite: "None",
-  };
-
-  res.cookie("jwt", token, cookieOptions);
-  user.password = undefined;
+  user.password = undefined; // Hide password from response
 
   return response(res, statusCode, message, {
-    token,
+    token, // Send token in response body
     user: {
       id: user._id,
       username: user.username,
@@ -81,13 +73,6 @@ const loginUser = async (req, res) => {
 
 const logout = (req, res) => {
   try {
-    res.cookie("jwt", "loggedout", {
-      expires: new Date(Date.now() + 10 * 1000),
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-    });
-
     return response(res, 200, "Logged out successfully");
   } catch (error) {
     console.error("Logout Error:", error);
