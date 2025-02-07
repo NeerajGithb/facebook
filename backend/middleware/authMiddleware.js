@@ -5,7 +5,6 @@ const User = require("../model/User");
 const authMiddleware = async (req, res, next) => {
   try {
     let token;
-    console.log('Authorization Header:', req.headers.authorization);
     // ✅ Extract token from Authorization header
     if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
       token = req.headers.authorization.split(" ")[1];
@@ -30,8 +29,8 @@ const authMiddleware = async (req, res, next) => {
       console.log("User not found");
       return response(res, 401, "User not found. Please log in again.");
     }
-
     req.user = currentUser; // Attach user to request for downstream usage
+    req.user.userId = currentUser._id;
     next(); // Proceed to the next middleware or route handler
   } catch (error) {
     console.error("Error in authMiddleware:", error);

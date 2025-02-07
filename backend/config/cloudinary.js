@@ -1,53 +1,39 @@
-const multer = require('multer')
-const {CloudinaryStorage} = require('multer-storage-cloudinary')
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 
+// ✅ Configure Cloudinary
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// ✅ Use Cloudinary as storage for Multer
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: "uploads",  // Change this to whatever folder you want in Cloudinary
+        resource_type: "auto",  // Automatically detect if it's an image or video
+        allowed_formats: ["jpg", "png", "jpeg", "mp4", "mov", "avi"],
+    },
+});
 
-const uploadFileToCloudinary = (file) =>{
-    const options = {
-        resource_type:  file.mimetype.startsWith('video') ? 'video' : 'image'
-    }
+// ✅ Use Multer with Cloudinary storage
+const multerMiddleware = multer({ storage: storage });
 
-
-    return new Promise((resolve, reject) =>{
-        //for video update 
-        if(file.mimetype.startsWith('video')){
-            cloudinary.uploader.upload_large(file.path,options,(error,result) =>{
-                if(error){
-                    return reject(error);
-                }
-                resolve(result)
-            })
-        }else{
-            //image upload
-            cloudinary.uploader.upload(file.path,options,(error,result) =>{
-                if(error){
-                    return reject(error);
-                }
-                resolve(result)
-            })
-        }
-    })
-}
-const deleteFileFromCloudinary = (publicId) => {
-    return new Promise((resolve, reject) => {
-      cloudinary.uploader.destroy(publicId, (error, result) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      });
+// ✅ Function to upload file to Cloudinary (if needed separately)
+const uploadFileToCloudinary = async (file) => {
+    return await cloudinary.uploader.upload(file.path, {
+        resource_type: file.mimetype.startsWith("video") ? "video" : "image",
     });
-  };
-  
-const multerMiddleware = multer({dest : "uploads/"})
+};
 
-module.exports= {multerMiddleware,uploadFileToCloudinary ,deleteFileFromCloudinary}
+// ✅ Function to delete file from Cloudinary
+const deleteFileFromCloudinary = async (publicId) => {
+    return await cloudinary.uploader.destroy(publicId);
+};
+
+// ✅ Export the functions & middleware
+module.exports = { multerMiddleware, uploadFileToCloudinary, deleteFileFromCloudinary };

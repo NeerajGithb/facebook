@@ -1,3 +1,4 @@
+import axios from "axios";
 import axiosInstance from "./url.service";
 
 // ✅ Register User
@@ -17,7 +18,7 @@ export const loginUser = async (userData) => {
     const response = await axiosInstance.post("/auth/login", userData);
     if (response.data?.data?.token) {
       // Store the token in localStorage
-      localStorage.setItem("token", response.data.data.token); // Use "jwtToken" as key
+      localStorage.setItem("jwt", response.data.data.token); // Use "jwtToken" as key
     }
     console.log(response.data);
     return response.data;
@@ -31,7 +32,7 @@ export const loginUser = async (userData) => {
 // ✅ Logout User
 export const logout = async () => {
   try {
-    localStorage.removeItem("token"); // Remove JWT from localStorage
+    localStorage.removeItem("jwt"); // Remove JWT from localStorage
     console.log("Token removed from localStorage");
 
     // Return a success status with a message
@@ -42,12 +43,10 @@ export const logout = async () => {
   }
 };
 
-
-
 // ✅ Check User Authentication
 export const checkUserAuth = async () => {
   try {
-    const token = localStorage.getItem("token"); // Retrieve token from localStorage
+    const token = localStorage.getItem("jwt"); // Retrieve token from localStorage
     if (token) {
       // Proceed with the request if a token exists
       const response = await axiosInstance.get("/users/check-auth", {
@@ -58,7 +57,6 @@ export const checkUserAuth = async () => {
       });
 
       if (response.status === 200 && response.data.status === "success") {
-        console.log("User authenticated:", response.data); // Debug log for successful authentication
         return { isAuthenticated: true, user: response?.data?.data };
       }
     } else {

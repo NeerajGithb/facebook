@@ -9,7 +9,7 @@ const response = require("../utils/responceHandler");
 const createPost = async(req,res) =>{
     try {
         const userId = req.user.userId;
-
+        console.log(userId)
         const {content} = req.body;
         const file= req.file;
         let mediaUrl = null;
@@ -205,6 +205,7 @@ const getPostByUserId = async(req, res) => {
 const likePost = async(req, res) => {
     const {postId} = req.params;
     const userId= req.user.userId;
+    console.log(userId)
     try {
          const post = await Post.findById(postId)
          if(!post) {

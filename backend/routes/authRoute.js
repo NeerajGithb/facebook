@@ -1,28 +1,42 @@
 const express = require('express');
 const { registerUser, loginUser, logout } = require('../controllers/authController');
 const passport = require('passport');
-const createSendToken = require('../utils/createSendToken'); // Importing createSendToken
 const router = express.Router();
 
+const jwt = require("jsonwebtoken");
+
+// User registration and login routes
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.get('/logout', logout);
 
-// Google OAuth routes
+// Function to sign the token
+const signToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
+// Google OAuth route for authentication
 router.get('/google', passport.authenticate('google', {
   scope: ['profile', 'email']
 }));
 
-// Google callback route
+// Callback route for Google OAuth
 router.get('/google/callback', passport.authenticate('google', {
   failureRedirect: `${process.env.FRONTEND_URL}/user-login`, session: false
 }), (req, res) => {
   if (req.user) {
-    // If the user is authenticated, create the token and send it in response
-    createSendToken(req.user, 200, res, "Google login successful");
+
+    const token = signToken(req?.user?._id);
+    req.user.password = undefined; // Hide password from response
+    return res.redirect(`${process.env.FRONTEND_URL}/?token=${token}`);
   } else {
-    // Redirect to login page on failure
-    res.redirect(`${process.env.FRONTEND_URL}/user-login`);
+    // Handle failure by returning error in response body
+    return res.status(400).json({
+      status: 'error',
+      message: 'Google login failed, please try again.',
+    });
   }
 });
 

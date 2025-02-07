@@ -9,7 +9,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token"); // ✅ Ensure correct token key
+    const token = localStorage.getItem("jwt"); // ✅ Ensure correct token key
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
