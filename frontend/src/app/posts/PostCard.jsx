@@ -143,11 +143,11 @@ const PostCard = ({ post, isLiked, onShare, onComment, onLike }) => {
             <img
               src={post?.mediaUrl}
               alt="post_image"
-              className="w-full h-auto sm:rounded-lg mb-4"
+              className="w-full sm:w-auto h-full m-auto  sm:h-[500px] sm:rounded-lg mb-4"
             />
           )}
           {post?.mediaUrl && post.mediaType === "video" && (
-            <video controls className="w-full min-h-full sm:rounded-lg mb-4">
+            <video controls className="w-full sm:w-auto h-full sm:h-[500px] sm:rounded-lg mb-4">
               <source src={post?.mediaUrl} type="video/mp4" />
               Your browser does not support the video tag
             </video>

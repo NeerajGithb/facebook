@@ -8,13 +8,12 @@ import { Button } from "@/components/ui/button";
 const StorySection = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [maxScroll, setMaxScroll] = useState(0);
-  const containerRef = useRef();
-  const {story,fetchStoryPost} = usePostStore()
+  const containerRef = useRef(null);
+  const { story, fetchStoryPost } = usePostStore();
 
   useEffect(() => {
-    fetchStoryPost()
-  },[fetchStoryPost])
-
+    fetchStoryPost();
+  }, [fetchStoryPost]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -32,7 +31,7 @@ const StorySection = () => {
   const scroll = (direction) => {
     const container = containerRef.current;
     if (container) {
-      const scrollAmount = direction === "left" ? -200 : 200;
+      const scrollAmount = direction === "left" ? -300 : 300;
       container.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
@@ -45,48 +44,48 @@ const StorySection = () => {
   };
 
   return (
-    <div className="relative">
-      <div
-        ref={containerRef}
-        onScroll={handleScroll}
-        className="flex space-x-2 overflow-x-hidden py-4"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        <motion.div
-          className=" flex space-x-2"
-          drag="x"
-          dragConstraints={{
-            right: 0,
-            left:
-              -((story.length + 1) * 200) +
-              containerRef.current?.offsetWidth,
-          }}
+    <div className="relative flex justify-center items-center py-4">
+      {/* Story Container (Fixed Width) */}
+      <div className="w-full max-w-[600px] overflow-hidden relative">
+        {/* Scroll Container */}
+        <div
+          ref={containerRef}
+          onScroll={handleScroll}
+          className="flex space-x-2 overflow-x-auto scrollbar-hide w-full"
         >
-          <StoryCard isAddStory={true} />
-          {story?.map((story) => (
-            <StoryCard story={story} key={story._id} />
-          ))}
-        </motion.div>
+          <motion.div
+            className="flex space-x-2 w-max"
+            drag="x"
+            dragConstraints={{
+              right: 0,
+              left: -((story.length + 1) * 200) + (containerRef.current?.offsetWidth || 0),
+            }}
+          >
+            <StoryCard isAddStory={true} />
+            {story?.map((story) => (
+              <StoryCard story={story} key={story._id} />
+            ))}
+          </motion.div>
+        </div>
 
-        {/* left side scrollbutton  */}
+        {/* Left Scroll Button */}
         {scrollPosition > 0 && (
           <Button
             variant="outline"
             size="icon"
-            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-800 roudned-full shadow-lg transition-opacity duration-300 ease-in-out"
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-800 rounded-full shadow-lg"
             onClick={() => scroll("left")}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
         )}
 
-        {/* right side scrollbutton  */}
-
+        {/* Right Scroll Button */}
         {scrollPosition < maxScroll && (
           <Button
             variant="outline"
             size="icon"
-            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-800 roudned-full shadow-lg transition-opacity duration-300 ease-in-out"
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-800 rounded-full shadow-lg"
             onClick={() => scroll("right")}
           >
             <ChevronRight className="h-4 w-4" />
