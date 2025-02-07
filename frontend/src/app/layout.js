@@ -3,6 +3,8 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import AuthWrapper from "./auth-wrapper";
 import { Toaster } from "react-hot-toast";
+import { Suspense } from "react";
+import Loader from "@/lib/Loader"; // Ensure you have a Loader component
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -26,11 +28,11 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Toaster/>
+        <Toaster />
         <ThemeProvider attribute="class">
-          <AuthWrapper>
-          {children}
-          </AuthWrapper>
+          <Suspense fallback={<Loader />}>
+            <AuthWrapper>{children}</AuthWrapper>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>
